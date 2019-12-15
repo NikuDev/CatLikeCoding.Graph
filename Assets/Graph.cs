@@ -6,23 +6,37 @@ public class Graph : MonoBehaviour
 {
     public Transform PointPrefab;
 
+    // make the inspector use a slider by defining '[Range(start,end)]'
+    [Range (10,100)]
+    public int AmountCubes;
+
     void Awake()
     {
-        for(int i = 0; i < 10; i++)
+        float step = 2f / AmountCubes;
+        Vector3 scale = Vector3.one * step;
+        Vector3 position;
+
+        position.z = 0f;
+
+        for(int i = 0; i < this.AmountCubes; i++)
         {
             Transform point = Instantiate(this.PointPrefab);
+            position.x = (i + 0.5f) * step - 1f;
 
-            // we'd like the range to be x: -1 to x:1 instead of x:0 to x:2
-            // so substract -1 at the end of the formula
+            //// linear positioning where y = x
+            //// x=-1, y=-1 - x=-0.8, y=-0.8, x=-0.6, y=-0.6 etc.
+            //position.y = position.x;
+            
+            // using x^2 to set the .y position
+            position.y = position.x * position.x;
 
-            // edit2: to compensate the width of a prefab (0.2), we'll add 0.5f
-            // to the current iteration. this will center it on -1, -0.8, -0.6
-            // opposed to -1.1, -0.9, -0.7 etc.
-            point.localPosition = Vector3.right * ((i + 0.5f) / 5f - 1f);
+            point.localPosition = position;
+            point.localScale = scale;
 
-            // reduce the scale of the prefab to create space between them
-            // we'll use 5 cubes per 1x/y/z
-            point.localScale = Vector3.one / 5f;
+            // to make the instantiated prefab a child of the Graph (this),
+            // we can use 'transform', which is inherently available in this object
+            point.SetParent(this.transform, false);
+
         }
     }
 
